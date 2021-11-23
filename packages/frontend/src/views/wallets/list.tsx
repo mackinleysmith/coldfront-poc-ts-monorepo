@@ -1,0 +1,174 @@
+import { FC, useEffect, useState } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+import * as solanaWeb3 from "@solana/web3.js";
+import { Link, useNavigate } from "react-router-dom";
+
+export interface Wallet {
+  id: number;
+  name: string;
+  address: string;
+  user_id: string;
+}
+
+const getWallets = async (token: string) => {
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+  const response = await fetch(`${serverUrl}/api/wallets`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return await response.json();
+};
+
+export const getBalance = async (wallet: Wallet) => {
+  const conn = new solanaWeb3.Connection(
+    solanaWeb3.clusterApiUrl("mainnet-beta")
+  );
+
+  const walletAddress = new solanaWeb3.PublicKey(wallet.address);
+  const tokenAddress = new solanaWeb3.PublicKey(
+    "7aKNMEvezpGe2NuqRJKU3c59DGAC2fydCtKjmaHtdQ4o"
+  );
+
+  const response = await conn.getParsedTokenAccountsByOwner(walletAddress, {
+    mint: tokenAddress,
+  });
+
+  return response.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount;
+};
+
+const ViewWalletBtn: FC<{ wallet: Wallet }> = ({ wallet }) => {
+  return (
+    <Link
+      to={`/wallets/${wallet.id}`}
+      type="button"
+      className="btn btn-outline-primary btn-sm"
+      style={{
+        fontSize: 12,
+        padding: "2px 4px",
+        marginTop: -4,
+      }}
+    >
+      View
+    </Link>
+  );
+};
+
+const WalletDeleteBtn: FC<{ wallet: Wallet }> = ({ wallet }) => {
+  const { getAccessTokenSilently } = useAuth0();
+
+  const onClick = async () => {
+    await fetch(
+      `${process.env.REACT_APP_SERVER_URL}/api/wallets/${wallet.id}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${await getAccessTokenSilently()}` },
+      }
+    );
+
+    window.location.reload();
+  };
+
+  return (
+    <button
+      type="button"
+      className="btn btn-outline-danger btn-sm"
+      onClick={onClick}
+      style={{
+        fontSize: 12,
+        padding: "2px 4px",
+        marginTop: -4,
+      }}
+    >
+      Delete
+    </button>
+  );
+};
+
+interface WalletRowProps {
+  wallet: Wallet;
+}
+
+const WalletRow: FC<WalletRowProps> = ({ wallet }) => {
+  const [balance, setBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    getBalance(wallet).then((balance) => {
+      setBalance(balance);
+    });
+  }, [wallet]);
+
+  return (
+    <tr>
+      <td>{wallet.name}</td>
+      <td>
+        <code>{wallet.address}</code>
+      </td>
+      <td>{balance ?? 0} CFT</td>
+      <td>
+        <ViewWalletBtn wallet={wallet} /> <WalletDeleteBtn wallet={wallet} />
+      </td>
+    </tr>
+  );
+};
+
+interface WalletsAppProps {}
+
+const WalletsListPage: FC<WalletsAppProps> = () => {
+  const [errorMessage, setErrorMessage] = useState("");
+  const [wallets, setWallets] = useState<Wallet[]>();
+  const { getAccessTokenSilently } = useAuth0();
+
+  useEffect(() => {
+    setErrorMessage("");
+
+    getAccessTokenSilently()
+      .then(getWallets)
+      .then((responseData) => {
+        setWallets(responseData);
+      })
+      .catch((error: any) => {
+        setErrorMessage(error.message);
+      });
+  }, [getAccessTokenSilently]);
+
+  return (
+    <div>
+      <h1>
+        Wallets
+        <Link
+          className="btn btn-primary float-right mt-1"
+          type="button"
+          to="/wallets/new"
+        >
+          New Wallet
+        </Link>
+      </h1>
+
+      {errorMessage && (
+        <div className="alert alert-danger" role="alert">
+          {errorMessage}
+        </div>
+      )}
+
+      {wallets && (
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Balance</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {wallets.map((wallet) => (
+              <WalletRow key={wallet.id} wallet={wallet} />
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
+
+export default WalletsListPage;
