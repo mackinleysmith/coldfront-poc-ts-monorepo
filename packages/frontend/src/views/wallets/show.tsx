@@ -2,7 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { Wallet, getBalance } from "./list";
+import { getWalletBalance, Wallet } from "../../data/wallets";
 
 export const WalletPage: FC<{}> = () => {
   const { id } = useParams();
@@ -22,7 +22,7 @@ export const WalletPage: FC<{}> = () => {
       );
 
       const wallet: Wallet = await response.json();
-      const balance = await getBalance(wallet);
+      const balance = await getWalletBalance(wallet);
       setWallet(wallet);
       setBalance(balance);
     })();

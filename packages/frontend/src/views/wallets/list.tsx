@@ -1,40 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import * as solanaWeb3 from "@solana/web3.js";
-import { Link, useNavigate } from "react-router-dom";
-
-export interface Wallet {
-  id: number;
-  name: string;
-  address: string;
-  user_id: string;
-}
-
-const getWallets = async (token: string) => {
-  const serverUrl = process.env.REACT_APP_SERVER_URL;
-  const response = await fetch(`${serverUrl}/api/wallets`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  return await response.json();
-};
-
-export const getBalance = async (wallet: Wallet) => {
-  const conn = new solanaWeb3.Connection(
-    solanaWeb3.clusterApiUrl("mainnet-beta")
-  );
-
-  const walletAddress = new solanaWeb3.PublicKey(wallet.address);
-  const tokenAddress = new solanaWeb3.PublicKey(
-    "7aKNMEvezpGe2NuqRJKU3c59DGAC2fydCtKjmaHtdQ4o"
-  );
-
-  const response = await conn.getParsedTokenAccountsByOwner(walletAddress, {
-    mint: tokenAddress,
-  });
-
-  return response.value[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount;
-};
+import { Link } from "react-router-dom";
+import { getWalletBalance, getUserWallets, Wallet } from "../../data/wallets";
 
 const ViewWalletBtn: FC<{ wallet: Wallet }> = ({ wallet }) => {
   return (
@@ -92,7 +59,7 @@ const WalletRow: FC<WalletRowProps> = ({ wallet }) => {
   const [balance, setBalance] = useState<number | null>(null);
 
   useEffect(() => {
-    getBalance(wallet).then((balance) => {
+    getWalletBalance(wallet).then((balance) => {
       setBalance(balance);
     });
   }, [wallet]);
@@ -122,7 +89,7 @@ const WalletsListPage: FC<WalletsAppProps> = () => {
     setErrorMessage("");
 
     getAccessTokenSilently()
-      .then(getWallets)
+      .then(getUserWallets)
       .then((responseData) => {
         setWallets(responseData);
       })
