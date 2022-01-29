@@ -267,7 +267,8 @@ export const getProvider = (): PhantomProvider | undefined => {
   window.open("https://phantom.app/", "_blank");
 };
 
-const NETWORK = solanaWeb3.clusterApiUrl("mainnet-beta");
+// const NETWORK = solanaWeb3.clusterApiUrl("mainnet-beta");
+const NETWORK = "https://solana-api.projectserum.com/";
 export const getSolanaConnection = (): solanaWeb3.Connection => new solanaWeb3.Connection(NETWORK);
 
 enum AccountState {
