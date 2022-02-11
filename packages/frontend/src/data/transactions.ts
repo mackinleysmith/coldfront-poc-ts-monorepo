@@ -259,15 +259,12 @@ interface PhantomProvider {
 
 export const getProvider = (): PhantomProvider | undefined => {
   if ("solana" in window) {
-    console.log('solana is in the window!');
     const anyWindow: any = window;
     const provider = anyWindow.solana;
     if (provider.isPhantom) {
       return provider;
     }
   }
-  console.log('solana is not in the window!');
-  window.open("https://phantom.app/", "_blank");
 };
 
 export const useProvider = () => {
