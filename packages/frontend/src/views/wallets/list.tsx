@@ -78,9 +78,9 @@ const WalletRow: FC<WalletRowProps> = ({ wallet }) => {
   );
 };
 
-interface WalletsAppProps {}
+interface WalletsListPageProps {}
 
-const WalletsListPage: FC<WalletsAppProps> = () => {
+const WalletsListPage: FC<WalletsListPageProps> = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [wallets, setWallets] = useState<Wallet[]>();
   const { getAccessTokenSilently } = useAuth0();

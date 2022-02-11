@@ -1,10 +1,14 @@
 import * as solanaWeb3 from "@solana/web3.js";
 import { useState, useEffect } from "react";
+import { Route, Routes } from "react-router-dom";
 import {
   getProvider,
   createSignedSolanaTransaction,
   getSolanaConnection,
 } from "../../data/transactions";
+import PromoCheckoutPage from "./checkout";
+import MarketListPage from "./list";
+import PromoShowPage from "./show_promo";
 
 enum TransactionState {
   NOT_STARTED = "NOT_STARTED",
@@ -14,6 +18,14 @@ enum TransactionState {
 }
 
 const MarketApp = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<MarketListPage />} />
+      <Route path="/promos/:id" element={<PromoShowPage />} />
+      <Route path="/promos/:id/checkout" element={<PromoCheckoutPage />} />
+    </Routes>
+  );
+
   const provider = getProvider();
   const [connected, setConnected] = useState<boolean>(false);
   const [publicKey, setPublicKey] = useState<solanaWeb3.PublicKey | null>(null);
@@ -23,6 +35,7 @@ const MarketApp = () => {
 
   useEffect(() => {
     if (!provider) return;
+    console.log("we have a provider");
     provider.connect({ onlyIfTrusted: true }).catch((err) => {
       console.error("Phantom provider failed to connect with", err);
     });
@@ -66,6 +79,8 @@ const MarketApp = () => {
   }, [provider]);
 
   const onBuyClick = async () => {
+    const provider = getProvider();
+
     if (!provider || !publicKey) {
       provider?.connect();
       return;
@@ -96,9 +111,7 @@ const MarketApp = () => {
               <pre>fjkrsfaejfsdncsdhvleshflkd</pre>
             </>
           ) : (
-            <button className="btn btn-primary" onClick={onBuyClick}>
-              Buy something
-            </button>
+            <h1>WANNA BUY SOMETHIN?</h1>
           )}
         </>
       ) : (
@@ -106,7 +119,7 @@ const MarketApp = () => {
           <button
             className="btn btn-primary"
             onClick={() => {
-              provider?.connect();
+              getProvider()?.connect();
             }}
           >
             Connect your wallet

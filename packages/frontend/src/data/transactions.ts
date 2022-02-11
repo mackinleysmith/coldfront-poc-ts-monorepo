@@ -7,6 +7,7 @@ import * as solanaWeb3 from "@solana/web3.js";
 import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 import BufferLayout from "@solana/buffer-layout";
 import BN from "bn.js";
+import { useEffect, useState } from "react";
 
 declare global {
   interface Window {
@@ -258,13 +259,42 @@ interface PhantomProvider {
 
 export const getProvider = (): PhantomProvider | undefined => {
   if ("solana" in window) {
+    console.log('solana is in the window!');
     const anyWindow: any = window;
     const provider = anyWindow.solana;
     if (provider.isPhantom) {
       return provider;
     }
   }
+  console.log('solana is not in the window!');
   window.open("https://phantom.app/", "_blank");
+};
+
+export const useProvider = () => {
+  const [provider, setProvider] = useState(getProvider());
+  const [hasCheckedForProvider, setHasCheckedForProvider] = useState(false);
+
+  useEffect(() => {
+    if (provider) return;
+
+    const interval = setInterval(() => {
+      const currentProvider = getProvider();
+      if (currentProvider) {
+        setProvider(currentProvider);
+      } else {
+        setHasCheckedForProvider(true);
+      }
+    }, 500);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [provider]);
+
+  return {
+    provider,
+    phantomNotInstalled: !provider && hasCheckedForProvider,
+  };
 };
 
 // const NETWORK = solanaWeb3.clusterApiUrl("mainnet-beta");
