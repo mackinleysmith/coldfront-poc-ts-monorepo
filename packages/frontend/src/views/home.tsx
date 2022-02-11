@@ -8,7 +8,7 @@ const Home = () => (
       src={logo}
       alt="React logo"
       width="550"
-      style={{ maxWidth: 550, marginTop: -50 }}
+      style={{ maxWidth: 550, marginTop: -50, width: "100%" }}
     />
     <h1 className="mb-4" style={{ marginTop: -50 }}>
       Rewarding Climate Action

@@ -11,7 +11,7 @@ const MarketListPage = () => {
           src={logo}
           alt="React logo"
           width="550"
-          style={{ maxWidth: 550, marginTop: 102 }}
+          style={{ maxWidth: 550, marginTop: 102, width: "100%" }}
         />
       </div>
       <h1
