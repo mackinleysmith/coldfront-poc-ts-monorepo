@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { PROMOS } from "../../data/promos";
-import logo from "../../components/cover.png";
+import logo from "../../components/logo_market.png";
 
 const MarketListPage = () => {
   return (
@@ -14,18 +14,7 @@ const MarketListPage = () => {
           style={{ maxWidth: 550, marginTop: 102, width: "100%" }}
         />
       </div>
-      <h1
-        className="text-center"
-        style={{
-          marginTop: -90,
-          marginLeft: 138,
-          fontWeight: "bold",
-          color: "graytext",
-        }}
-      >
-        <small>The Marketplace</small>
-      </h1>
-      <table className="table mt-5 mx-auto" style={{ maxWidth: 550 }}>
+      <table className="table mx-auto vertical-align" style={{ maxWidth: 550 }}>
         <tbody>
           {PROMOS.map((promo) => (
             <tr key={promo.id}>
@@ -39,7 +28,7 @@ const MarketListPage = () => {
                   className="btn btn-success btn-sm"
                   type="button"
                   to={`/market/promos/${promo.id}`}
-                  style={{ margin: "-6px 0", position: "relative", top: -2 }}
+                  // style={{ margin: "-6px 0", position: "relative", top: -2 }}
                 >
                   Unlock Code
                 </Link>

@@ -38,7 +38,7 @@ const DonationOptionsPage = () => {
         Select which innovation area you are most passionate about:
         <br />
       </p>
-      <table className="table">
+      <table className="table vertical-align">
         <tbody>
           {DONATION_OPTIONS.map((option) => (
             <tr key={option.id}>
