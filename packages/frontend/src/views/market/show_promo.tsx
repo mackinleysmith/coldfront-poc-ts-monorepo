@@ -19,7 +19,7 @@ const PromoShowPage = () => {
         <Link
           className="btn btn-success btn-lg"
           type="button"
-          to={`/market/promos/${promo.id}/checkout`}
+          to={`/market/promos/${promo.id}/donation_options`}
         >
           Yeah, buy that shit!
         </Link>
