@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { useParams } from "react-router";
 import { PROMOS_BY_ID } from "../../data/promos";
+import { CAUSES_BY_ID } from "../../data/causes";
 
 enum PhantomConnectionState {
   CONNECTING = "CONNECTING",
@@ -21,9 +22,16 @@ enum TransactionState {
   FAILED = "FAILED",
 }
 
+// Create our number formatter.
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
+
 const PromoCheckoutPage = () => {
-  const { id } = useParams();
+  const { id, cause_id } = useParams();
   const promo = PROMOS_BY_ID[id!];
+  const cause = CAUSES_BY_ID[cause_id!];
 
   const { provider, phantomNotInstalled } = useProvider();
   const [phantomConnectionState, setPhantomConnectionState] =
@@ -105,10 +113,10 @@ const PromoCheckoutPage = () => {
   return (
     <div className="hero text-center" style={{ marginTop: 300, maxWidth: 800 }}>
       {provider ? (
-        <>
-          <h1>Checkout</h1>
-          {phantomConnectionState === PhantomConnectionState.CONNECTED ? (
-            transactionState === TransactionState.NOT_STARTED ? (
+        phantomConnectionState === PhantomConnectionState.CONNECTED ? (
+          transactionState === TransactionState.NOT_STARTED ? (
+            <>
+              <h1>Checkout</h1>
               <p className="lead">
                 All systems go. Click that button when you're ready.
                 <br />
@@ -118,24 +126,41 @@ const PromoCheckoutPage = () => {
                   type="button"
                   onClick={makeTransaction}
                 >
-                  Make Transaction
+                  Make transaction
                 </button>
               </p>
-            ) : transactionState === TransactionState.CONFIRMING ? (
-              <p className="lead">Confirming your transaction...</p>
-            ) : transactionState === TransactionState.CONFIRMED ? (
+            </>
+          ) : transactionState === TransactionState.CONFIRMING ? (
+            <>
+              <h1>Checkout in progress...</h1>
+              <p className="lead">This may take a few moments.</p>
+            </>
+          ) : transactionState === TransactionState.CONFIRMED ? (
+            <>
+              <h1>Success!</h1>
               <p className="lead">
-                Transaction confirmed! Here's your promo code!
+                Transaction confirmed!{" "}
+                {currencyFormatter.format(promo.price_in_caps * 0.9)} is now
+                being invested in {cause.title}, and in the meantime, here's
+                your promo code for {promo.title} at {promo.supplier}:
                 <br />
                 <code>{promo.code}</code>
               </p>
-            ) : transactionState === TransactionState.FAILED ? (
+            </>
+          ) : transactionState === TransactionState.FAILED ? (
+            <>
+              <h1>Checkout failed</h1>
               <p className="lead">Aw heck, something went wrong.</p>
-            ) : null
-          ) : (
-            phantomConnectionState === PhantomConnectionState.FAILED && (
+            </>
+          ) : null
+        ) : (
+          phantomConnectionState === PhantomConnectionState.FAILED && (
+            <>
+              <h1>Checkout</h1>
               <p className="lead">
-                We're so stoked! We just need to connect to your Phantom Wallet.
+                Connect your wallet to complete the transaction. ColdFront uses
+                blockchain technology to ensure every transaction is public and
+                auditable.
                 <br />
                 <br />
                 <button
@@ -145,12 +170,12 @@ const PromoCheckoutPage = () => {
                     provider?.connect();
                   }}
                 >
-                  Connect to Phantom
+                  Connect wallet
                 </button>
               </p>
-            )
-          )}
-        </>
+            </>
+          )
+        )
       ) : phantomNotInstalled ? (
         <>
           <h1>Woah there!</h1>

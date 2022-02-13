@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import PromoCheckoutPage from "./checkout";
-import DonationOptionsPage from "./donation_options";
+import CausesPage from "./causes";
 import MarketListPage from "./list";
 import PromoShowPage from "./show_promo";
 
@@ -9,11 +9,11 @@ const MarketApp = () => {
     <Routes>
       <Route path="/" element={<MarketListPage />} />
       <Route path="/promos/:id" element={<PromoShowPage />} />
+      <Route path="/promos/:id/causes" element={<CausesPage />} />
       <Route
-        path="/promos/:id/donation_options"
-        element={<DonationOptionsPage />}
+        path="/promos/:id/with_cause/:cause_id/checkout"
+        element={<PromoCheckoutPage />}
       />
-      <Route path="/promos/:id/checkout" element={<PromoCheckoutPage />} />
     </Routes>
   );
 };

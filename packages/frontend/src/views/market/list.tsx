@@ -14,16 +14,20 @@ const MarketListPage = () => {
           style={{ maxWidth: 550, marginTop: 102, width: "100%" }}
         />
       </div>
-      <table className="table mx-auto vertical-align" style={{ maxWidth: 550 }}>
+      <table
+        className="table mx-auto vertical-align text-center"
+        style={{ maxWidth: 550 }}
+      >
         <tbody>
           {PROMOS.map((promo) => (
             <tr key={promo.id}>
-              <td>
+              <td className="text-left">
                 <strong>{promo.supplier}</strong>
               </td>
-              <td className="text-center">{promo.title}</td>
-              <td className="text-center">{promo.price_in_caps} CAPs</td>
-              <td className="text-center">
+              <td>{promo.title}</td>
+              <td>for</td>
+              <td>${promo.price_in_caps} in CAPs</td>
+              <td>
                 <Link
                   className="btn btn-success btn-sm"
                   type="button"
